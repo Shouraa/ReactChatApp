@@ -16,7 +16,6 @@ class SendMessageForm extends Component {
 
   handleSubmit = e => {
     e.preventDefault();
-    console.log(this.state.message);
     this.props.sendMessage(this.state.message);
     this.setState({
       message: ""
@@ -28,6 +27,7 @@ class SendMessageForm extends Component {
     return (
       <form className="send-message-form" onSubmit={this.handleSubmit}>
         <input
+          disabled={this.props.disabled}
           type="text"
           value={this.state.message}
           placeholder="Type your message and hit ENTER"

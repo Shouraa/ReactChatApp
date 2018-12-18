@@ -5,7 +5,7 @@ import "./App.css";
 import MessageList from "./components/MessageList";
 import SendMessageForm from "./components/SendMessageForm";
 import RoomList from "./components/RoomList";
-// import NewRoomForm from "./components/NewRoomForm";
+import NewRoomForm from "./components/NewRoomForm";
 
 import { tokenUrl, instanceLocator } from "./config/Config";
 
@@ -34,10 +34,10 @@ class App extends Component {
     chatManager
       .connect()
       .then(currentUser => {
-        console.log("Connected as user ", currentUser);
+        // console.log("Connected as user ", currentUser);
       })
       .catch(error => {
-        console.error("error:", error);
+        console.log("error:", error);
       });
 
     chatManager
@@ -58,7 +58,7 @@ class App extends Component {
         roomId: roomId,
         hooks: {
           onMessage: message => {
-            console.log(`Received new message: ${message.text}`);
+            // console.log(`Received new message: ${message.text}`);
             this.setState({
               messages: [...this.state.messages, message]
             });
@@ -92,8 +92,17 @@ class App extends Component {
       roomId: this.state.roomId
     });
   };
+
+  createRoom = name => {
+    this.currentUser
+      .createRoom({
+        name
+      })
+      .then(room => this.subscribeToRoom(room.id))
+      .catch(err => console.log("error with create room: ", err));
+  };
+
   render() {
-    console.log("this.state.messages: ", this.state.messages);
     return (
       <div className="app">
         <RoomList
@@ -101,9 +110,15 @@ class App extends Component {
           subscribeToRoom={this.subscribeToRoom}
           rooms={[...this.state.joinableRooms, ...this.state.joinedRooms]}
         />
-        <MessageList messages={this.state.messages} />
-        <SendMessageForm sendMessage={this.sendMessage} />
-        {/* <NewRoomForm /> */}
+        <MessageList
+          roomId={this.state.roomId}
+          messages={this.state.messages}
+        />
+        <SendMessageForm
+          disabled={!this.state.roomId}
+          sendMessage={this.sendMessage}
+        />
+        <NewRoomForm createRoom={this.createRoom} />
       </div>
     );
   }
